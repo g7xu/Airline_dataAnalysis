@@ -55,9 +55,14 @@ def main():
     flights["DEST_CITY_NAME"] = split_DEST_CITY_STATE.str[0]
 
     ## adjusting column name
-    flights.rename(columns={"OP_CARRIER": "OP_CARRIER_IATA"}, inplace=True)
+    flights.rename(columns={"OP_CARRIER": "OP_CARRIER_IATA_CODE"}, inplace=True)
     flights.rename(columns={"ORIGIN": "ORIGIN_AIRPORT_IATA"}, inplace=True)
     flights.rename(columns={"DESTINATION": "DEST_AIRPORT_IATA"}, inplace=True)
+
+    ## dropping unnesserary columns
+    flights.drop(
+        columns=["ORIGIN_AIRPORT_ID", "DEST_AIRPORT_ID", "CANCELLED"], inplace=True
+    )
 
     # loading tickets data
     tickets = pd.read_csv("data/original_data/Tickets.csv")
@@ -72,6 +77,9 @@ def main():
     ## adjusting column name
     tickets.rename(columns={"ORIGIN": "ORIGIN_AIRPORT_IATA"}, inplace=True)
     tickets.rename(columns={"DESTINATION": "DEST_AIRPORT_IATA"}, inplace=True)
+
+    ## dropping unnesserary columns
+    tickets.drop(columns=["ORIGIN_COUNTRY", "ROUNDTRIP"], inplace=True)
 
     # loading airport codes data
     airport_codes = pd.read_csv("data/original_data/Airport_Codes.csv")
@@ -94,7 +102,11 @@ def main():
     airport_codes["COORDINATES_LATITUDE"] = (
         airport_codes["COORDINATES"].apply(lambda x: x.split(", ")[1]).astype(float)
     )
-    airport_codes.drop(columns=["COORDINATES"], inplace=True)
+
+    # dropping unnesserary columns
+    airport_codes.drop(
+        columns=["COORDINATES", "CONTINENT", "ISO_COUNTRY"], inplace=True
+    )
 
     # export cleaned data to csv in the data file
     flights.drop_duplicates().to_csv("data/cleaned_data/Flights.csv", index=False)
