@@ -1,11 +1,6 @@
-# the preprocessing script won't remove missing value
-# it will
-# 1. remove all the cancelled flights
-# 2. only look at the round trip tickets
-# 3. constrain the range of certain column (ex. distance can not be negative)
-# 4. convert the data type of certain column (ex. convert string to float)
-# 5. adjust the column name to be more appropriate
-# TODO: needs to handle missing value
+# this script remove conduct basic data cleaning on the flight,
+# ticket and airport code data. Afer basic preprocessing, the column name
+# of each data set will be standardized
 import pandas as pd
 import numpy as np
 import re
@@ -34,10 +29,10 @@ def preprocess_flights(flights: pd.DataFrame) -> pd.DataFrame:
     """
     Preprocessing the flights data that
     1. remove all the cancelled flights
-    2. constrain the range of certain column (ex. distance can not be negative)
-    3. convert the data type of certain column (ex. convert string to float)
-    4. adjust the column name to be more appropriate (joint carrier and flight numerber)
-    5. ensure atomic data set
+    2. adjust the data type of certain columns
+    3. atomic each column in data set
+    4. constrain the range of certain
+    column (ex. distance can not be negative)
     ---
     flights: pandas DataFrame contain information of the flights
     """
@@ -45,25 +40,24 @@ def preprocess_flights(flights: pd.DataFrame) -> pd.DataFrame:
     flights = flights[flights["CANCELLED"] == 0]
 
     ## adjusting data type of certain columns
-    flights = flights.assign(FL_DATE=pd.to_datetime(flights["FL_DATE"]))
-    flights = flights.assign(OP_CARRIER=flights["OP_CARRIER"].astype(str))
-    flights = flights.assign(OP_CARRIER_FL_NUM=flights["OP_CARRIER_FL_NUM"].astype(str))
     flights = flights.assign(
-        AIR_TIME=flights["AIR_TIME"].apply(flight_float_conversion)
-    )
-    flights = flights.assign(
-        DISTANCE=flights["DISTANCE"].apply(flight_float_conversion)
+        FL_DATE=pd.to_datetime(flights["FL_DATE"]),
+        OP_CARRIER=flights["OP_CARRIER"].astype(str),
+        OP_CARRIER_FL_NUM=flights["OP_CARRIER_FL_NUM"].astype(str),
+        AIR_TIME=flights["AIR_TIME"].apply(flight_float_conversion),
+        DISTANCE=flights["DISTANCE"].apply(flight_float_conversion),
     )
 
     ## split certain column into two
     split_ORIGIN_CITY_STATE = flights["ORIGIN_CITY_NAME"].str.split(", ")
     split_DEST_CITY_STATE = flights["DEST_CITY_NAME"].str.split(", ")
 
-    flights = flights.assign(ORIGIN_CITY_NAME=split_ORIGIN_CITY_STATE.str[0])
-    flights = flights.assign(ORIGIN_STATE_NAME=split_ORIGIN_CITY_STATE.str[1])
-
-    flights = flights.assign(DEST_STATE_NAME=split_DEST_CITY_STATE.str[1])
-    flights = flights.assign(DEST_CITY_NAME=split_DEST_CITY_STATE.str[0])
+    flights = flights.assign(
+        ORIGIN_CITY_NAME=split_ORIGIN_CITY_STATE.str[0],
+        ORIGIN_STATE_NAME=split_ORIGIN_CITY_STATE.str[1],
+        DEST_STATE_NAME=split_DEST_CITY_STATE.str[1],
+        DEST_CITY_NAME=split_DEST_CITY_STATE.str[0],
+    )
 
     ## combine certain column into one
     flights = flights.assign(

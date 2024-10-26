@@ -38,68 +38,6 @@ def finding_cost_revenue(
         outbound_average_ticket_price=routeTrip_flights["average_ticket_price_routes"],
     ).drop(columns=["average_ticket_price_routes"])
 
-    # # finding the ticket price for both inbound and outbound flights
-    # routeTrip_flights = (
-    #     routeTrip_flights.merge(
-    #         average_TicketPrice[
-    #             ["round_trip_route_IATA", "OP_CARRIER", "average_ticket_price_op"]
-    #         ],
-    #         left_on=["round_trip_route_IATA", "inbound_OP_CARRIER"],
-    #         right_on=["round_trip_route_IATA", "OP_CARRIER"],
-    #         how="left",
-    #     )
-    #     .drop(columns=["OP_CARRIER"])
-    #     .rename(columns={"average_ticket_price_op": "inbound_average_ticket_price"})
-    # )
-
-    # to_replace = (
-    #     routeTrip_flights[routeTrip_flights["inbound_average_ticket_price"].isna()]
-    #     .reset_index()
-    #     .merge(
-    #         average_TicketPrice[
-    #             ["round_trip_route_IATA", "average_ticket_price_routes"]
-    #         ].drop_duplicates(),
-    #         left_on=["round_trip_route_IATA"],
-    #         right_on=["round_trip_route_IATA"],
-    #         how="left",
-    #     )
-    #     .set_index("index")["average_ticket_price_routes"]
-    # )
-    # routeTrip_flights.loc[to_replace.index, "inbound_average_ticket_price"] = to_replace
-
-    # routeTrip_flights = (
-    #     routeTrip_flights.merge(
-    #         average_TicketPrice[
-    #             ["round_trip_route_IATA", "OP_CARRIER", "average_ticket_price_op"]
-    #         ],
-    #         left_on=[
-    #             "round_trip_route_IATA",
-    #             "outbound_OP_CARRIER",
-    #         ],
-    #         right_on=["round_trip_route_IATA", "OP_CARRIER"],
-    #         how="left",
-    #     )
-    #     .drop(columns=["OP_CARRIER"])
-    #     .rename(columns={"average_ticket_price_op": "outbound_average_ticket_price"})
-    # )
-
-    # to_replace = (
-    #     routeTrip_flights[routeTrip_flights["outbound_average_ticket_price"].isna()]
-    #     .reset_index()
-    #     .merge(
-    #         average_TicketPrice[
-    #             ["round_trip_route_IATA", "average_ticket_price_routes"]
-    #         ].drop_duplicates(),
-    #         left_on=["round_trip_route_IATA"],
-    #         right_on=["round_trip_route_IATA"],
-    #         how="left",
-    #     )
-    #     .set_index("index")["average_ticket_price_routes"]
-    # )
-    # routeTrip_flights.loc[to_replace.index, "outbound_average_ticket_price"] = (
-    #     to_replace
-    # )
-
     ## calculating the cost of each round trip
 
     # operation cost and overhead cost and delay cost
