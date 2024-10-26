@@ -28,11 +28,6 @@ def find_number(text):
 def preprocess_flights(flights: pd.DataFrame) -> pd.DataFrame:
     """
     Preprocessing the flights data that
-    1. remove all the cancelled flights
-    2. adjust the data type of certain columns
-    3. atomic each column in data set
-    4. constrain the range of certain
-    column (ex. distance can not be negative)
     ---
     flights: pandas DataFrame contain information of the flights
     """
@@ -77,10 +72,10 @@ def preprocess_flights(flights: pd.DataFrame) -> pd.DataFrame:
         & (flights["ARR_DELAY"] >= -1440)
     ]
     # handle the outliers of distance
-    flights = flights[flights["DISTANCE"] <= 5100]
+    flights = flights[(flights["DISTANCE"] <= 5100) & (flights["DISTANCE"] >= 10)]
 
     # handle the outliers of air time
-    flights = flights[flights["AIR_TIME"] <= 660]
+    flights = flights[(flights["AIR_TIME"] <= 660) & (flights["AIR_TIME"] >= 10)]
 
     return flights.drop_duplicates()
 
@@ -112,8 +107,6 @@ def preprocess_tickets(tickets: pd.DataFrame) -> pd.DataFrame:
     tickets = tickets.assign(
         ONE_PASSENGERS_FARE=tickets["ITIN_FARE"] / tickets["PASSENGERS"]
     )
-
-    ## handle outliers by replacing the outlier with NaN
 
     # handle passenger fare with less than 5000 dollars
     tickets = tickets[tickets["ONE_PASSENGERS_FARE"] <= 5000]
