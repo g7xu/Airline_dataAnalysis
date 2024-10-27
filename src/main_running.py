@@ -21,11 +21,11 @@ def main():
     check_tickets_constrains(tickets)
     check_airport_codes_constrains(airport_codes)
 
-    ## finding round_trip routes
-    roundTrip_flights, soleTrip_flights = finding_roundtripFlights(flights)
-
     ## finding the average ticket price of round trip tickets
     average_TicketPrice = finding_avg_roundtripTickets(tickets)
+
+    ## finding round_trip routes
+    roundTrip_flights, soleTrip_flights = finding_roundtripFlights(flights)
 
     ## finding cost and revenue for each round trip routes
     roundtrip_profit = finding_cost_revenue(
