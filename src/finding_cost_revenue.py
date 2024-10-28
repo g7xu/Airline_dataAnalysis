@@ -23,20 +23,25 @@ def finding_cost_revenue(
     ## only look at the round trip flights that associate with the tickets
     routeTrip_flights = routeTrip_flights[
         routeTrip_flights["round_trip_route_IATA"].isin(
-            average_TicketPrice["round_trip_route_IATA"]
+            average_TicketPrice["RoundTrip_AIRPORT_IATA_CODE"]
         )
     ]
 
     routeTrip_flights = routeTrip_flights.merge(
         how="left",
         right=average_TicketPrice,
-        on="round_trip_route_IATA",
+        left_on="round_trip_route_IATA",
+        right_on="RoundTrip_AIRPORT_IATA_CODE",
     )
 
     routeTrip_flights = routeTrip_flights.assign(
-        inbound_average_ticket_price=routeTrip_flights["average_ticket_price_routes"],
-        outbound_average_ticket_price=routeTrip_flights["average_ticket_price_routes"],
-    ).drop(columns=["average_ticket_price_routes"])
+        inbound_average_ticket_price=routeTrip_flights[
+            "avg_ticket_price_perPassenger_oneWay"
+        ],
+        outbound_average_ticket_price=routeTrip_flights[
+            "avg_ticket_price_perPassenger_oneWay"
+        ],
+    )
 
     ## calculating the cost of each round trip
 

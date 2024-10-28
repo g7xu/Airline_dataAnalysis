@@ -115,7 +115,9 @@ def finding_roundtripFlights(flights: pd.DataFrame) -> pd.DataFrame:
 
     p_sole_routes = pd.concat(sole_routes, axis=1).T if len(sole_routes) > 0 else None
     sole_routes = []
-    updating_roundtrips(p_sole_routes)
+
+    for index, single_routes in p_sole_routes.groupby("OP_CARRIER"):
+        updating_roundtrips(single_routes)
 
     return (
         pd.concat(rt_routes, axis=0) if len(rt_routes) > 0 else None,
