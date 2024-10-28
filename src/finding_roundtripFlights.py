@@ -93,12 +93,14 @@ def finding_roundtripFlights(flights: pd.DataFrame) -> pd.DataFrame:
                 route["DEST_AIRPORT_IATA_CODE"],
                 route["ORIGIN_AIRPORT_IATA_CODE"],
             )
+
+            # if we can not find candidate route, we add current route to the candidate dictionary
             if (
                 corr_round_trip_candidate not in rt_candidate_dict
                 or len(rt_candidate_dict[corr_round_trip_candidate]) == 0
             ):
                 updating_rt_candidate(round_trip_candidate, rt_candidate_dict, route)
-            else:
+            else:  # if we can find candidate route, we add the current route to the roundtrip routes
                 adding_rt_routes(
                     round_trip_candidate,
                     rt_routes,
@@ -106,16 +108,19 @@ def finding_roundtripFlights(flights: pd.DataFrame) -> pd.DataFrame:
                     rt_candidate_dict[corr_round_trip_candidate].pop(0),
                 )
 
+        # adding the sole routes to the sole routes list
         for key, value in rt_candidate_dict.items():
             if isinstance(value, list) and len(value) > 0:
                 sole_routes.extend(value)
 
+    # group the flights by the tail number and find the roundtrip routes
     for index, tail_num_df in flights.groupby("TAIL_NUM"):
         updating_roundtrips(tail_num_df)
 
     p_sole_routes = pd.concat(sole_routes, axis=1).T if len(sole_routes) > 0 else None
     sole_routes = []
 
+    # group the rest of the flights by the carrier and find the roundtrip routes
     for index, single_routes in p_sole_routes.groupby("OP_CARRIER"):
         updating_roundtrips(single_routes)
 

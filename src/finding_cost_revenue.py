@@ -6,12 +6,25 @@ OP_COST_LARGE_AIRPORT = 10000
 OP_COST_MEDIUM_AIRPORT = 5000
 MAX_PASSENGER = 200
 
+# COST related
+OP_COST_PER_MILE = 8
+OVERHEAD_COST_PER_MILE = 1.18
+BAGGAGE_REVENUE_PER_PASSENGER = 35
+
+# delay related
+TOLARENT_DELAY = 15
+DELAY_COST_PER_MINUTE = 75
+
 
 def cal_delay_cost(delay: int) -> float:
     """
     calculate the cost of delay
     """
-    return 0 if delay <= 15 else (delay - 15) * 75
+    return (
+        0
+        if delay <= TOLARENT_DELAY
+        else (delay - TOLARENT_DELAY) * DELAY_COST_PER_MINUTE
+    )
 
 
 def finding_cost_revenue(
@@ -47,10 +60,13 @@ def finding_cost_revenue(
 
     # operation cost and overhead cost and delay cost
     routeTrip_flights = routeTrip_flights.assign(
-        inbound_operation_cost=routeTrip_flights["inbound_DISTANCE"] * 8,
-        outbound_operation_cost=routeTrip_flights["outbound_DISTANCE"] * 8,
-        inbound_overhead_cost=routeTrip_flights["inbound_DISTANCE"] * 1.18,
-        outbound_overhead_cost=routeTrip_flights["outbound_DISTANCE"] * 1.18,
+        inbound_operation_cost=routeTrip_flights["inbound_DISTANCE"] * OP_COST_PER_MILE,
+        outbound_operation_cost=routeTrip_flights["outbound_DISTANCE"]
+        * OP_COST_PER_MILE,
+        inbound_overhead_cost=routeTrip_flights["inbound_DISTANCE"]
+        * OVERHEAD_COST_PER_MILE,
+        outbound_overhead_cost=routeTrip_flights["outbound_DISTANCE"]
+        * OVERHEAD_COST_PER_MILE,
         inbound_dep_delay_cost=routeTrip_flights["inbound_DEP_DELAY"].apply(
             cal_delay_cost
         ),
@@ -66,6 +82,7 @@ def finding_cost_revenue(
     )
 
     # airport operation cost
+    # TODO: can be optimized
     temp = routeTrip_flights.assign(
         temp=routeTrip_flights["round_trip_route_IATA"].apply(lambda x: x[0])
     )
@@ -142,8 +159,12 @@ def finding_cost_revenue(
 
     # baggage revenue
     routeTrip_flights = routeTrip_flights.assign(
-        inbound_baggage_revenues=routeTrip_flights["inbound_passengers"] * 0.5 * 35,
-        outbound_baggage_revenues=routeTrip_flights["outbound_passengers"] * 0.5 * 35,
+        inbound_baggage_revenues=routeTrip_flights["inbound_passengers"]
+        * 0.5
+        * BAGGAGE_REVENUE_PER_PASSENGER,
+        outbound_baggage_revenues=routeTrip_flights["outbound_passengers"]
+        * 0.5
+        * BAGGAGE_REVENUE_PER_PASSENGER,
     )
 
     # total revenue
